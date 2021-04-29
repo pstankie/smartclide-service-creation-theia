@@ -1,0 +1,36 @@
+#widget-container h2 {
+    color: var(--theia-ui-font-color1);
+    font-size: 12px;
+    font-weight: 400;
+    padding: 10px;
+    text-transform: uppercase;
+}
+
+input{
+	margin-top: 4px;
+	background: transparent;
+    border: none;
+    font-size: 14px;
+    color: white;
+    width: 85%;
+}
+
+.cellID {
+	width: 130px;
+	padding-left: 10px;
+}
+
+table{
+	margin-top: 20px;
+	width:100%;
+}
+
+button{
+	margin-top: 20px;
+}
+
+#message{
+	display: none;
+	margin-left: 10px;
+	margin-top: 2px;
+}
