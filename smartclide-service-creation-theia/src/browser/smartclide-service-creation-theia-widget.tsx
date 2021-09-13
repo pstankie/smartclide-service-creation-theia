@@ -8,15 +8,14 @@ import { MessageService } from '@theia/core';
 export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 
     static readonly ID = 'smartclide-service-creation-theia:widget';
-    static readonly LABEL = 'Smartclide Service Creation Widget';
+    static readonly LABEL = 'Smartclide Service Creation';
 	static state = {
 		stateServiceURL: '',
 		stateName: '',
 		stateGitlabURL: '',
 		stateGitlabToken: '',
-		stateJenkinsURL: '',
-		stateJenkinsUser: '',
-		stateJenkinsToken:''
+		stateProjectVisibility: '',
+		stateDescription: ''
 	};
 	
     @inject(MessageService)
@@ -34,7 +33,7 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
     }
 
     protected render(): React.ReactNode {
-        const header = `Provide the information required to create the auto CI.`;
+        const header = `Provide the GitLab project configuration details.`;
         
 		return <div id='widget-container'>
             <AlertMessage type='INFO' header={header} />
@@ -45,12 +44,6 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 						<td className='cellID'>Service Creation URL</td>
 						<td>
 							<input onChange={this.updateInput} placeholder='Service' name='stateServiceURL'/>
-						</td>
-					  </tr>
-					  <tr>
-						<td className='cellID'>Project Name</td>
-						<td>
-							<input onChange={this.updateInput} maxLength={100} placeholder='Name' name='stateName'/>
 						</td>
 					  </tr>
 					  <tr>
@@ -66,21 +59,26 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 						</td>
 					  </tr>
 					  <tr>
-						<td className='cellID'>Jenkins Server Url</td>
+						<td className='cellID'>Project Name</td>
 						<td>
-							<input onChange={this.updateInput} placeholder='URL' name='stateJenkinsURL'/>
+							<input onChange={this.updateInput} maxLength={100} placeholder='Name' name='stateName'/>
 						</td>
 					  </tr>
 					  <tr>
-						<td className='cellID'>Jenkins Username</td>
-						<td>
-							<input onChange={this.updateInput} maxLength={100} placeholder='Username' name='stateJenkinsUser'/>
+						<td className='cellID'>Project Visibility</td>
+						<td id='radio_buttons'>
+							<input className='inputRadio' type="radio" id="visibility1" name="visibility" value="0" onChange={this.onValueChange}/>
+							<label htmlFor="visibility1">public</label>
+							<input className='inputRadio' type="radio" id="visibility2" name="visibility" value="1" onChange={this.onValueChange}/>
+							<label htmlFor="visibility2">internal</label>
+							<input className='inputRadio' type="radio" id="visibility3" name="visibility" value="2" onChange={this.onValueChange}/>
+							<label htmlFor="visibility3">private</label>
 						</td>
 					  </tr>
 					  <tr>
-						<td className='cellID'>Jenkins Token</td>
+						<td className='cellID'>Description</td>
 						<td>
-							<input type='password' onChange={this.updateInput} placeholder='Token' name='stateJenkinsToken'/>
+							<textarea id="textDescription" onChange={this.updateInputTextArea} rows={2}></textarea>
 						</td>
 					  </tr>
 					</tbody>
@@ -95,11 +93,18 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 		//if all the fields have values
 		if(SmartclideServiceCreationTheiaWidget.state.stateServiceURL!='' &&
 		   SmartclideServiceCreationTheiaWidget.state.stateName!='' && SmartclideServiceCreationTheiaWidget.state.stateGitlabURL!='' &&
-		   SmartclideServiceCreationTheiaWidget.state.stateGitlabToken!='' && SmartclideServiceCreationTheiaWidget.state.stateJenkinsURL!='' &&
-		   SmartclideServiceCreationTheiaWidget.state.stateJenkinsUser!='' && SmartclideServiceCreationTheiaWidget.state.stateJenkinsToken!='')
+		   SmartclideServiceCreationTheiaWidget.state.stateGitlabToken!='' && SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility!='' &&
+		   SmartclideServiceCreationTheiaWidget.state.stateDescription!='' )
 		{
+			console.log('SmartclideServiceCreationTheiaWidget.state.stateServiceURL: ', SmartclideServiceCreationTheiaWidget.state.stateServiceURL);
+			console.log('SmartclideServiceCreationTheiaWidget.state.stateName: ', SmartclideServiceCreationTheiaWidget.state.stateName);
+			console.log('SmartclideServiceCreationTheiaWidget.state.stateGitlabURL: ', SmartclideServiceCreationTheiaWidget.state.stateGitlabURL);
+			console.log('SmartclideServiceCreationTheiaWidget.state.stateGitlabToken: ', SmartclideServiceCreationTheiaWidget.state.stateGitlabToken);
+			console.log('SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility: ', SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility);
+			console.log('SmartclideServiceCreationTheiaWidget.state.stateDescription: ', SmartclideServiceCreationTheiaWidget.state.stateDescription);
+			
 			//post request
-			fetch(SmartclideServiceCreationTheiaWidget.state.stateServiceURL+'/createStucture', {
+			fetch(SmartclideServiceCreationTheiaWidget.state.stateServiceURL+'/createStructure', {
 				method: 'post',
 				headers: {
 					'Accept': '*/*',
@@ -107,9 +112,8 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 					'projectName' : SmartclideServiceCreationTheiaWidget.state.stateName,
 					'gitLabServerURL' : SmartclideServiceCreationTheiaWidget.state.stateGitlabURL,
 					'gitlabToken' : SmartclideServiceCreationTheiaWidget.state.stateGitlabToken,
-					'jenkinsServerUrl' : SmartclideServiceCreationTheiaWidget.state.stateJenkinsURL,
-					'jenkinsUsername' : SmartclideServiceCreationTheiaWidget.state.stateJenkinsUser,
-					'jenkinsToken' : SmartclideServiceCreationTheiaWidget.state.stateJenkinsToken
+					'projVisibility' : SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility,
+					'projDescription' : SmartclideServiceCreationTheiaWidget.state.stateDescription
 				}
 			}).then(res => res.json())
 			  .then((out) => {
@@ -144,4 +148,14 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 		const key =e.currentTarget.name as keyof typeof SmartclideServiceCreationTheiaWidget.state
 		SmartclideServiceCreationTheiaWidget.state[key] = e.currentTarget.value;
     }
+
+	//update for text 
+	updateInputTextArea (e: React.ChangeEvent<HTMLTextAreaElement>) {
+		SmartclideServiceCreationTheiaWidget.state.stateDescription = e.currentTarget.value;
+    }
+
+	//update for radio group
+	onValueChange(event: React.ChangeEvent<HTMLInputElement>) {
+		SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility= event.target.value;
+	 }
 }

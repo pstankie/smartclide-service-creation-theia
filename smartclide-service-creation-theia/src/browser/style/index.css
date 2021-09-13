@@ -29,6 +29,22 @@ button{
 	margin-top: 20px;
 }
 
+
+label{
+	margin-right: 10px;
+	font-style: italic;
+}
+
+.inputRadio{
+    width: fit-content;
+}
+
+textarea{
+    margin-top: 4px;
+	width: 85%;
+}
+
+
 #message{
 	display: none;
 	margin-left: 10px;
