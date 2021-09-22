@@ -3,6 +3,7 @@ import { injectable, postConstruct, inject } from 'inversify';
 import { AlertMessage } from '@theia/core/lib/browser/widgets/alert-message';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { MessageService } from '@theia/core';
+import { TerminalService } from '@theia/terminal/lib/browser/base/terminal-service';
 
 @injectable()
 export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
@@ -20,6 +21,9 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 	
     @inject(MessageService)
     protected readonly messageService!: MessageService;
+
+	@inject(TerminalService)
+	private readonly terminalService: TerminalService;
 
     @postConstruct()
     protected async init(): Promise < void> {
@@ -85,6 +89,7 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 				</table>
             </div>
 			<button className='theia-button secondary' title='Create' onClick={_a => this.runprocess()}>Run</button>
+			<div id='waitAnimation' className="lds-dual-ring"></div>
 			<i id='message'></i>
 		</div>
     }
@@ -103,6 +108,9 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 			console.log('SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility: ', SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility);
 			console.log('SmartclideServiceCreationTheiaWidget.state.stateDescription: ', SmartclideServiceCreationTheiaWidget.state.stateDescription);
 			
+			//waiting animation start
+			(document.getElementById("waitAnimation") as HTMLElement).style.display = "block";
+
 			//post request
 			fetch(SmartclideServiceCreationTheiaWidget.state.stateServiceURL+'/createStructure', {
 				method: 'post',
@@ -119,6 +127,9 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 			  .then((out) => {
 					var obj = JSON.parse(JSON.stringify(out));
 					
+					//waiting animation stop
+					(document.getElementById("waitAnimation") as HTMLElement).style.display = "none";
+
 					//show message get from service
 					(document.getElementById("message") as HTMLElement).style.display = "block";
 					(document.getElementById('message') as HTMLElement).innerHTML = obj.message;
@@ -126,12 +137,29 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 					//check post request status
 					if (obj.status==0){
 						this.messageService.info('Successful Execution');
+						
+						//Create dir and clone
+						(async () => {
+							try {
+								let terminalWidget = await this.terminalService.newTerminal({});
+								await terminalWidget.start();
+								await terminalWidget.sendText('mkdir '+SmartclideServiceCreationTheiaWidget.state.stateName+'\r\n');
+								await terminalWidget.sendText('cd '+SmartclideServiceCreationTheiaWidget.state.stateName+'\r\n');
+								let gitClone= 'git clone https://oauth2:' + SmartclideServiceCreationTheiaWidget.state.stateGitlabToken
+													+ '@' + obj.message.replace('https://','');
+								await terminalWidget.sendText(gitClone+'\r\n');
+								await this.terminalService.open(terminalWidget);
+							} catch(e) {
+								this.messageService.info('Error in git clone');
+							}
+						})();
 					}
 					else{
 						this.messageService.info('Error In Execution');
 					}
 			  })
 			  .catch(err => {
+				(document.getElementById("waitAnimation") as HTMLElement).style.display = "none";
 				console.log('err: ', err);
 				(document.getElementById("message") as HTMLElement).style.display = "block";
 				(document.getElementById('message') as HTMLElement).innerHTML = 'Error With Service';
