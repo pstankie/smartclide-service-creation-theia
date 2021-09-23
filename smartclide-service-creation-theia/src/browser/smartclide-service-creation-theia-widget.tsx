@@ -4,6 +4,7 @@ import { AlertMessage } from '@theia/core/lib/browser/widgets/alert-message';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { MessageService } from '@theia/core';
 import { TerminalService } from '@theia/terminal/lib/browser/base/terminal-service';
+import { CommandService } from '@theia/core/lib/common/command';
 
 @injectable()
 export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
@@ -24,6 +25,9 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 
 	@inject(TerminalService)
 	private readonly terminalService: TerminalService;
+
+	@inject(CommandService)
+    protected readonly commandService: CommandService;
 
     @postConstruct()
     protected async init(): Promise < void> {
@@ -149,6 +153,9 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 													+ '@' + obj.message.replace('https://','');
 								await terminalWidget.sendText(gitClone+'\r\n');
 								await this.terminalService.open(terminalWidget);
+
+								//go to File Explorer
+								this.commandService.executeCommand('workbench.files.action.focusFilesExplorer');
 							} catch(e) {
 								this.messageService.info('Error in git clone');
 							}
