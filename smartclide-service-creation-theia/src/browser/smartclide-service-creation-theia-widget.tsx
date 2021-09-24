@@ -154,8 +154,8 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 								await terminalWidget.sendText(gitClone+'\r\n');
 								await this.terminalService.open(terminalWidget);
 
-								//go to File Explorer
-								this.commandService.executeCommand('workbench.files.action.focusFilesExplorer');
+								//go to Open Folder
+								this.commandService.executeCommand('workspace:open');
 							} catch(e) {
 								this.messageService.info('Error in git clone');
 							}
