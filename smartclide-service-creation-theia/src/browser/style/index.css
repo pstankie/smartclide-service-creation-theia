@@ -1,4 +1,4 @@
-#widget-container h2 {
+#widget-container-ServiceCreation h2 {
     color: var(--theia-ui-font-color1);
     font-size: 12px;
     font-weight: 400;
@@ -6,7 +6,7 @@
     text-transform: uppercase;
 }
 
-input{
+#widget-container-ServiceCreation input{
 	margin-top: 4px;
 	background: transparent;
     border: none;
@@ -20,30 +20,30 @@ input{
 	padding-left: 10px;
 }
 
-table{
+#widget-container-ServiceCreation table{
 	margin-top: 20px;
 	width:100%;
 }
 
-button{
+#widget-container-ServiceCreation button{
 	margin-top: 20px;
 }
 
 
-label{
+#widget-container-ServiceCreation label{
 	margin-right: 10px;
 	font-style: italic;
 }
 
-.inputRadio{
+#widget-container-ServiceCreation input[type='radio']{
     width: fit-content;
 }
 
-textarea{
+#widget-container-ServiceCreation textarea{
     margin-top: 4px;
 	width: 85%;
+	resize: vertical;
 }
-
 
 #message{
 	display: none;
@@ -51,6 +51,15 @@ textarea{
 	margin-top: 2px;
 }
 
+#widget-container-ServiceCreation input[type='checkbox']{
+	width: auto !important;
+    margin-left: 20px;
+}
+
+#jenkins{
+	display: none;
+	margin-top: 5px !important;
+}
 
 /* waiting animation */
 .lds-dual-ring {
