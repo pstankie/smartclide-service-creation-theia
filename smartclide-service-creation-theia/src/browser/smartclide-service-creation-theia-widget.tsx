@@ -28,7 +28,10 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 		stateGitlabURL: '',
 		stateGitlabToken: '',
 		stateProjectVisibility: '',
-		stateDescription: ''
+		stateDescription: '',
+		stateJenkinsURL: '',
+		stateJenkinsUser: '',
+		stateJenkinsToken: ''
 	};
 	
     @inject(MessageService)
@@ -54,7 +57,7 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
     protected render(): React.ReactNode {
         const header = `Provide the GitLab project configuration details.`;
         
-		return <div id='widget-container'>
+		return <div id='widget-container-ServiceCreation'>
             <AlertMessage type='INFO' header={header} />
             <div id='info'>
 				<table>
@@ -102,6 +105,31 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 					  </tr>
 					</tbody>
 				</table>
+				<label>
+					<input type="checkbox" onChange={this.onCheckBoxChange}/>Use Jenkins
+				</label>
+				<table id='jenkins'>
+					<tbody>
+				      <tr>
+						<td className='cellID'>Jenkins Server Url</td>
+						<td>
+							<input onChange={this.updateInput} placeholder='URL' name='stateJenkinsURL'/>
+						</td>
+					  </tr>
+					  <tr>
+						<td className='cellID'>Jenkins Username</td>
+						<td>
+							<input onChange={this.updateInput} maxLength={100} placeholder='Username' name='stateJenkinsUser'/>
+						</td>
+					  </tr>
+					  <tr>
+						<td className='cellID'>Jenkins Token</td>
+						<td>
+							<input type='password' onChange={this.updateInput} placeholder='Token' name='stateJenkinsToken'/>
+						</td>
+					  </tr>
+					</tbody>
+				</table>
             </div>
 			<button className='theia-button secondary' title='Create' onClick={_a => this.runprocess()}>Run</button>
 			<div id='waitAnimation' className="lds-dual-ring"></div>
@@ -114,15 +142,8 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 		if(SmartclideServiceCreationTheiaWidget.state.stateServiceURL!='' &&
 		   SmartclideServiceCreationTheiaWidget.state.stateName!='' && SmartclideServiceCreationTheiaWidget.state.stateGitlabURL!='' &&
 		   SmartclideServiceCreationTheiaWidget.state.stateGitlabToken!='' && SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility!='' &&
-		   SmartclideServiceCreationTheiaWidget.state.stateDescription!='' )
+		   SmartclideServiceCreationTheiaWidget.state.stateDescription!='' && (document.getElementById("jenkins") as HTMLElement).style.display=="none")
 		{
-			console.log('SmartclideServiceCreationTheiaWidget.state.stateServiceURL: ', SmartclideServiceCreationTheiaWidget.state.stateServiceURL);
-			console.log('SmartclideServiceCreationTheiaWidget.state.stateName: ', SmartclideServiceCreationTheiaWidget.state.stateName);
-			console.log('SmartclideServiceCreationTheiaWidget.state.stateGitlabURL: ', SmartclideServiceCreationTheiaWidget.state.stateGitlabURL);
-			console.log('SmartclideServiceCreationTheiaWidget.state.stateGitlabToken: ', SmartclideServiceCreationTheiaWidget.state.stateGitlabToken);
-			console.log('SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility: ', SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility);
-			console.log('SmartclideServiceCreationTheiaWidget.state.stateDescription: ', SmartclideServiceCreationTheiaWidget.state.stateDescription);
-			
 			//waiting animation start
 			(document.getElementById("waitAnimation") as HTMLElement).style.display = "block";
 
@@ -203,5 +224,15 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 	//update for radio group
 	onValueChange(event: React.ChangeEvent<HTMLInputElement>) {
 		SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility= event.target.value;
+	}
+
+	//update Jenkins visibility
+	onCheckBoxChange(e: React.ChangeEvent<HTMLInputElement>) {
+		if(e.target.checked){
+			(document.getElementById("jenkins") as HTMLElement).style.display = "block";
+		}
+		else{
+			(document.getElementById("jenkins") as HTMLElement).style.display = "none";
+		}
 	 }
 }
