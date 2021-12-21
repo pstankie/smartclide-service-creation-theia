@@ -173,25 +173,61 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 					//check post request status
 					if (obj.status==0){
 						this.messageService.info('Successful Execution');
-						
 						//Create dir and clone
-						(async () => {
-							try {
-								let terminalWidget = await this.terminalService.newTerminal({});
-								await terminalWidget.start();
-								await terminalWidget.sendText('mkdir '+SmartclideServiceCreationTheiaWidget.state.stateName+'\r\n');
-								await terminalWidget.sendText('cd '+SmartclideServiceCreationTheiaWidget.state.stateName+'\r\n');
-								let gitClone= 'git clone https://oauth2:' + SmartclideServiceCreationTheiaWidget.state.stateGitlabToken
-													+ '@' + obj.message.replace('https://','');
-								await terminalWidget.sendText(gitClone+'\r\n');
-								await this.terminalService.open(terminalWidget);
+						this.createAndClone(obj.message);
+					}
+					else{
+						this.messageService.info('Error In Execution');
+					}
+			  })
+			  .catch(err => {
+				(document.getElementById("waitAnimation") as HTMLElement).style.display = "none";
+				console.log('err: ', err);
+				(document.getElementById("message") as HTMLElement).style.display = "block";
+				(document.getElementById('message') as HTMLElement).innerHTML = 'Error With Service';
+			  });
+		}
+		else if(SmartclideServiceCreationTheiaWidget.state.stateServiceURL!='' &&
+		  SmartclideServiceCreationTheiaWidget.state.stateName!='' && SmartclideServiceCreationTheiaWidget.state.stateGitlabURL!='' &&
+		  SmartclideServiceCreationTheiaWidget.state.stateGitlabToken!='' && SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility!='' &&
+		  SmartclideServiceCreationTheiaWidget.state.stateDescription!='' && SmartclideServiceCreationTheiaWidget.state.stateJenkinsURL!='' &&
+		  SmartclideServiceCreationTheiaWidget.state.stateJenkinsUser!='' && SmartclideServiceCreationTheiaWidget.state.stateJenkinsToken!='' && 
+		  (document.getElementById("jenkins") as HTMLElement).style.display=="block")
+		{
+			//waiting animation start
+			(document.getElementById("waitAnimation") as HTMLElement).style.display = "block";
 
-								//go to Open Folder
-								this.commandService.executeCommand('workspace:open');
-							} catch(e) {
-								this.messageService.info('Error in git clone');
-							}
-						})();
+			//post request
+			fetch(SmartclideServiceCreationTheiaWidget.state.stateServiceURL+'/createStructure', {
+				method: 'post',
+				headers: {
+					'Accept': '*/*',
+					'Access-Control-Allow-Origin': '*',
+					'projectName' : SmartclideServiceCreationTheiaWidget.state.stateName,
+					'gitLabServerURL' : SmartclideServiceCreationTheiaWidget.state.stateGitlabURL,
+					'gitlabToken' : SmartclideServiceCreationTheiaWidget.state.stateGitlabToken,
+					'projVisibility' : SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility,
+					'projDescription' : SmartclideServiceCreationTheiaWidget.state.stateDescription,
+					'jenkinsServerUrl' : SmartclideServiceCreationTheiaWidget.state.stateJenkinsURL,
+					'jenkinsUsername' : SmartclideServiceCreationTheiaWidget.state.stateJenkinsUser,
+					'jenkinsToken' : SmartclideServiceCreationTheiaWidget.state.stateJenkinsToken
+				}
+			}).then(res => res.json())
+			  .then((out) => {
+					var obj = JSON.parse(JSON.stringify(out));
+					
+					//waiting animation stop
+					(document.getElementById("waitAnimation") as HTMLElement).style.display = "none";
+
+					//show message get from service
+					(document.getElementById("message") as HTMLElement).style.display = "block";
+					(document.getElementById('message') as HTMLElement).innerHTML = obj.message;
+					
+					//check post request status
+					if (obj.status==0){
+						this.messageService.info('Successful Execution');
+						//Create dir and clone
+						this.createAndClone(obj.message);
 					}
 					else{
 						this.messageService.info('Error In Execution');
@@ -209,6 +245,28 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 			this.messageService.info('Provide values for all fields');
 		}
     }
+
+	//create dir and clone
+	createAndClone(message: String){
+		//Create dir and clone
+		(async () => {
+			try {
+				let terminalWidget = await this.terminalService.newTerminal({});
+				await terminalWidget.start();
+				await terminalWidget.sendText('mkdir '+SmartclideServiceCreationTheiaWidget.state.stateName+'\r\n');
+				await terminalWidget.sendText('cd '+SmartclideServiceCreationTheiaWidget.state.stateName+'\r\n');
+				let gitClone= 'git clone https://oauth2:' + SmartclideServiceCreationTheiaWidget.state.stateGitlabToken
+									+ '@' + message.replace('https://','');
+				await terminalWidget.sendText(gitClone+'\r\n');
+				await this.terminalService.open(terminalWidget);
+
+				//go to Open Folder
+				this.commandService.executeCommand('workspace:open');
+			} catch(e) {
+				this.messageService.info('Error in git clone');
+			}
+		})();
+	}
 
 	//update the state
 	updateInput (e: React.ChangeEvent<HTMLInputElement>) {
