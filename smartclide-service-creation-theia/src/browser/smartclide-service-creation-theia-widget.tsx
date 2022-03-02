@@ -150,7 +150,11 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 
 			//testing keycloak
 			console.log('get keycloak json');
-			var keycloak = new (Keycloak as any)('https://keycloak-smartclide-che.che.smartclide.eu/auth/js/keycloak.js');
+			var keycloak = new (Keycloak as any)({
+				url: 'https://keycloak-smartclide-che.che.smartclide.eu/auth/',
+				realm: 'che',
+				clientId: 'che-public'
+			});
 			console.log('got keycloak json');
 			console.log('to start init');
 			keycloak.init({
