@@ -16,6 +16,7 @@ import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { MessageService } from '@theia/core';
 //import { TerminalService } from '@theia/terminal/lib/browser/base/terminal-service';
 import { CommandService } from '@theia/core/lib/common/command';
+import Keycloak from 'keycloak-js';
 
 @injectable()
 export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
@@ -147,6 +148,19 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 			//waiting animation start
 			(document.getElementById("waitAnimation") as HTMLElement).style.display = "block";
 
+			//testing keycloak
+			console.log('get keycloak json');
+			var keycloak = new (Keycloak as any)('https://keycloak-smartclide-che.che.smartclide.eu/auth/js/keycloak.js');
+			console.log('got keycloak json');
+			console.log('to start init');
+			keycloak.init({
+				onLoad: 'login-required'
+			});
+			console.log('finish init');
+			console.log('keycloak.subject: ' +keycloak.subject);
+			console.log('keycloak.token: ' +keycloak.token);
+
+			//this.authenticationSession.
 			//post request
 			fetch(SmartclideServiceCreationTheiaWidget.state.stateServiceURL+'/createStructure', {
 				method: 'post',
@@ -165,6 +179,10 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 					
 					//waiting animation stop
 					(document.getElementById("waitAnimation") as HTMLElement).style.display = "none";
+
+					//testing show keycloak
+					console.log('keycloak.subject: ' +keycloak.subject);
+					console.log('keycloak.token: ' +keycloak.token);
 
 					//show message get from service
 					(document.getElementById("message") as HTMLElement).style.display = "block";
