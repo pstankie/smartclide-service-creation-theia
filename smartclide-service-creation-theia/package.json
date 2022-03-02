@@ -10,6 +10,7 @@
   ],
   "dependencies": {
     "@theia/core": "latest",
+    "@theia/git": "latest",
     "@theia/terminal": "latest"
   },
   "devDependencies": {

@@ -14,7 +14,7 @@ import { injectable, postConstruct, inject } from 'inversify';
 import { AlertMessage } from '@theia/core/lib/browser/widgets/alert-message';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { MessageService } from '@theia/core';
-import { TerminalService } from '@theia/terminal/lib/browser/base/terminal-service';
+//import { TerminalService } from '@theia/terminal/lib/browser/base/terminal-service';
 import { CommandService } from '@theia/core/lib/common/command';
 
 @injectable()
@@ -37,8 +37,8 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
     @inject(MessageService)
     protected readonly messageService!: MessageService;
 
-	@inject(TerminalService)
-	private readonly terminalService: TerminalService;
+	//@inject(TerminalService)
+	//private readonly terminalService: TerminalService;
 
 	@inject(CommandService)
     protected readonly commandService: CommandService;
@@ -108,7 +108,7 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 				<label>
 					<input type="checkbox" onChange={this.onCheckBoxChange}/>Use Jenkins
 				</label>
-				<table id='jenkins'>
+				<table id='jenkins' style={{display: 'none'}}>
 					<tbody>
 				      <tr>
 						<td className='cellID'>Jenkins Server Url</td>
@@ -251,14 +251,10 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 		//Create dir and clone
 		(async () => {
 			try {
-				let terminalWidget = await this.terminalService.newTerminal({});
-				await terminalWidget.start();
-				await terminalWidget.sendText('mkdir '+SmartclideServiceCreationTheiaWidget.state.stateName+'\r\n');
-				await terminalWidget.sendText('cd '+SmartclideServiceCreationTheiaWidget.state.stateName+'\r\n');
-				let gitClone= 'git clone https://oauth2:' + SmartclideServiceCreationTheiaWidget.state.stateGitlabToken
+				//Clone
+				let gitClone= 'https://oauth2:' + SmartclideServiceCreationTheiaWidget.state.stateGitlabToken
 									+ '@' + message.replace('https://','');
-				await terminalWidget.sendText(gitClone+'\r\n');
-				await this.terminalService.open(terminalWidget);
+				this.commandService.executeCommand('git.clone', gitClone);
 
 				//go to Open Folder
 				this.commandService.executeCommand('workspace:open');
