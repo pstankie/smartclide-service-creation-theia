@@ -11,6 +11,10 @@
   "devDependencies": {
     "lerna": "2.4.0"
   },
+  "dependencies": {
+    "@theia/git": "latest",
+    "keycloak-js": "10.0.2"
+  },
   "workspaces": [
     "smartclide-service-creation-theia", "browser-app", "electron-app"
   ]
