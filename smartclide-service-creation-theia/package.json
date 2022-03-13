@@ -10,7 +10,6 @@
   ],
   "dependencies": {
     "@theia/core": "latest",
-    "@theia/git": "latest",
     "keycloak-js": "10.0.2",
     "@theia/terminal": "latest"
   },
