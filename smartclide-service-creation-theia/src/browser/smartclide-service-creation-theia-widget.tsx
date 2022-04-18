@@ -138,7 +138,7 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 		</div>
     }
 
-    protected runprocess(): void {
+    protected async runprocess() {
 		//if all the fields have values
 		if(SmartclideServiceCreationTheiaWidget.state.stateServiceURL!='' &&
 		   SmartclideServiceCreationTheiaWidget.state.stateName!='' && SmartclideServiceCreationTheiaWidget.state.stateGitlabURL!='' &&
@@ -157,9 +157,11 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 			});
 			console.log('got keycloak json');
 			console.log('to start init');
-			keycloak.init({
-				onLoad: 'login-required'
+			await keycloak.init({
+				onLoad: 'login-required',
+				checkLoginIframe: false
 			});
+
 			console.log('finish init');
 			console.log('keycloak.subject: ' +keycloak.subject);
 			console.log('keycloak.token: ' +keycloak.token);
