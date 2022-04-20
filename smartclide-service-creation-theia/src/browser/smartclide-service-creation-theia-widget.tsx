@@ -14,9 +14,9 @@ import { injectable, postConstruct, inject } from 'inversify';
 import { AlertMessage } from '@theia/core/lib/browser/widgets/alert-message';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { MessageService } from '@theia/core';
-//import { TerminalService } from '@theia/terminal/lib/browser/base/terminal-service';
 import { CommandService } from '@theia/core/lib/common/command';
-import Keycloak from 'keycloak-js';
+import { AuthenticationService } from '@theia/core/lib/browser/authentication-service'
+// import Keycloak from 'keycloak-js';
 
 @injectable()
 export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
@@ -38,11 +38,11 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
     @inject(MessageService)
     protected readonly messageService!: MessageService;
 
-	//@inject(TerminalService)
-	//private readonly terminalService: TerminalService;
-
 	@inject(CommandService)
     protected readonly commandService: CommandService;
+
+	@inject(AuthenticationService)
+	protected readonly authenticationService: AuthenticationService
 
     @postConstruct()
     protected async init(): Promise < void> {
@@ -139,6 +139,28 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
     }
 
     protected async runprocess() {
+		//Get User token
+		console.log('...');
+		console.log('before authenticationService');
+		var t= this.authenticationService.getProviderIds();
+		console.log('t length:'+ t.length)
+		for(var i=0; i<t.length; i++){
+			console.log('t['+ i +']: '+ t[i]);
+		}
+		var t1= await this.authenticationService.getSessions(t[0]);
+		console.log('t1 length:'+ t1.length)
+		for(var i=0; i<t1.length; i++){
+			console.log('t['+ i +'] accessToken: '+ t1[i].accessToken);
+			console.log('t['+ i +'] account: '+ t1[i].account);
+		}
+		console.log('.');
+		console.log('accessToken: '+ t1[0].accessToken);
+		console.log('account: '+ t1[0].account);
+		var accessToken= t1[0].accessToken;
+
+		console.log('after authenticationService');
+		console.log('...');
+
 		//if all the fields have values
 		if(SmartclideServiceCreationTheiaWidget.state.stateServiceURL!='' &&
 		   SmartclideServiceCreationTheiaWidget.state.stateName!='' && SmartclideServiceCreationTheiaWidget.state.stateGitlabURL!='' &&
@@ -149,30 +171,30 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 			(document.getElementById("waitAnimation") as HTMLElement).style.display = "block";
 
 			//testing keycloak
-			console.log('get keycloak json');
-			var keycloak = Keycloak({
-				url: 'https://keycloak-smartclide-che.che.smartclide.eu/auth/',
-				realm: 'che',
-				clientId: 'che-public'
-			});
-			console.log('got keycloak json');
-			console.log('to start init');
-			await keycloak.init({
-				onLoad: 'login-required',
-				checkLoginIframe: false
-			});
+			// console.log('get keycloak json');
+			// var keycloak = Keycloak({
+			// 	url: 'https://keycloak-smartclide-che.che.smartclide.eu/auth/',
+			// 	realm: 'che',
+			// 	clientId: 'che-public'
+			// });
+			// console.log('got keycloak json');
+			// console.log('to start init');
+			// await keycloak.init({
+			// 	onLoad: 'login-required',
+			// 	checkLoginIframe: false
+			// });
 
-			console.log('finish init');
-			console.log('keycloak.subject: ' +keycloak.subject);
-			console.log('keycloak.token: ' +keycloak.token);
+			// console.log('finish init');
+			// console.log('keycloak.subject: ' +keycloak.subject);
+			// console.log('keycloak.token: ' +keycloak.token);
 
-			//this.authenticationSession.
 			//post request
 			fetch(SmartclideServiceCreationTheiaWidget.state.stateServiceURL+'/createStructure', {
 				method: 'post',
 				headers: {
 					'Accept': '*/*',
 					'Access-Control-Allow-Origin': '*',
+					'Authorization': 'Bearer '+accessToken,
 					'projectName' : SmartclideServiceCreationTheiaWidget.state.stateName,
 					'gitLabServerURL' : SmartclideServiceCreationTheiaWidget.state.stateGitlabURL,
 					'gitlabToken' : SmartclideServiceCreationTheiaWidget.state.stateGitlabToken,
@@ -187,8 +209,8 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 					(document.getElementById("waitAnimation") as HTMLElement).style.display = "none";
 
 					//testing show keycloak
-					console.log('keycloak.subject: ' +keycloak.subject);
-					console.log('keycloak.token: ' +keycloak.token);
+					// console.log('keycloak.subject: ' +keycloak.subject);
+					// console.log('keycloak.token: ' +keycloak.token);
 
 					//show message get from service
 					(document.getElementById("message") as HTMLElement).style.display = "block";
