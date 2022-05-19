@@ -32,7 +32,8 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 		stateDescription: '',
 		stateJenkinsURL: '',
 		stateJenkinsUser: '',
-		stateJenkinsToken: ''
+		stateJenkinsToken: '',
+		stateKeycloakToken: ''
 	};
 
     @inject(MessageService)
@@ -55,8 +56,10 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
         this.update();
 
 		window.addEventListener("message", ({ data }) => {
-			if(typeof(data) === 'object' && 'type' in data && data.type === "iframe-communication")
+			if(typeof(data) === 'object' && 'type' in data && data.type === "iframe-communication"){
 				console.log("RECEIVED", data.message);
+				SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken = data.message;
+			}
 		});
     }
 
@@ -144,26 +147,8 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
     }
 
     protected async runprocess() {
-		//Get User token
 		console.log('...');
-		console.log('before authenticationService');
-		var t= this.authenticationService.getProviderIds();
-		console.log('t length:'+ t.length)
-		for(var i=0; i<t.length; i++){
-			console.log('t['+ i +']: '+ t[i]);
-		}
-		var t1= await this.authenticationService.getSessions(t[0]);
-		console.log('t1 length:'+ t1.length)
-		for(var i=0; i<t1.length; i++){
-			console.log('t['+ i +'] accessToken: '+ t1[i].accessToken);
-			console.log('t['+ i +'] account: '+ t1[i].account);
-		}
-		console.log('.');
-		console.log('accessToken: '+ t1[0].accessToken);
-		console.log('account: '+ t1[0].account);
-		var accessToken= t1[0].accessToken;
-
-		console.log('after authenticationService');
+		console.log(SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken);
 		console.log('...');
 
 		//if all the fields have values
@@ -175,31 +160,13 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 			//waiting animation start
 			(document.getElementById("waitAnimation") as HTMLElement).style.display = "block";
 
-			//testing keycloak
-			// console.log('get keycloak json');
-			// var keycloak = Keycloak({
-			// 	url: 'https://keycloak-smartclide-che.che.smartclide.eu/auth/',
-			// 	realm: 'che',
-			// 	clientId: 'che-public'
-			// });
-			// console.log('got keycloak json');
-			// console.log('to start init');
-			// await keycloak.init({
-			// 	onLoad: 'login-required',
-			// 	checkLoginIframe: false
-			// });
-
-			// console.log('finish init');
-			// console.log('keycloak.subject: ' +keycloak.subject);
-			// console.log('keycloak.token: ' +keycloak.token);
-
 			//post request
 			fetch(SmartclideServiceCreationTheiaWidget.state.stateServiceURL+'/createStructure', {
 				method: 'post',
 				headers: {
 					'Accept': '*/*',
 					'Access-Control-Allow-Origin': '*',
-					'Authorization': 'Bearer '+accessToken,
+					'Authorization': 'Bearer ' + SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken,
 					'projectName' : SmartclideServiceCreationTheiaWidget.state.stateName,
 					'gitLabServerURL' : SmartclideServiceCreationTheiaWidget.state.stateGitlabURL,
 					'gitlabToken' : SmartclideServiceCreationTheiaWidget.state.stateGitlabToken,
@@ -212,10 +179,6 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 
 					//waiting animation stop
 					(document.getElementById("waitAnimation") as HTMLElement).style.display = "none";
-
-					//testing show keycloak
-					// console.log('keycloak.subject: ' +keycloak.subject);
-					// console.log('keycloak.token: ' +keycloak.token);
 
 					//show message get from service
 					(document.getElementById("message") as HTMLElement).style.display = "block";
