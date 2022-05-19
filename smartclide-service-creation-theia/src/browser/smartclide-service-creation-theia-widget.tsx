@@ -1,11 +1,11 @@
 /**
  * @license
  * Copyright (C) 2021 UoM - University of Macedonia
- * 
- * This program and the accompanying materials are made available under the 
+ *
+ * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
  * https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  */
 
@@ -34,7 +34,7 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 		stateJenkinsUser: '',
 		stateJenkinsToken: ''
 	};
-	
+
     @inject(MessageService)
     protected readonly messageService!: MessageService;
 
@@ -51,13 +51,18 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
         this.title.caption = SmartclideServiceCreationTheiaWidget.LABEL;
         this.title.closable = true;
         this.title.iconClass = 'fa fa-cogs';
-		
+
         this.update();
+
+		window.addEventListener("message", ({ data }) => {
+			if(typeof(data) === 'object' && 'type' in data && data.type === "iframe-communication")
+				console.log("RECEIVED", data.message);
+		});
     }
 
     protected render(): React.ReactNode {
         const header = `Provide the GitLab project configuration details.`;
-        
+
 		return <div id='widget-container-ServiceCreation'>
             <AlertMessage type='INFO' header={header} />
             <div id='info'>
@@ -204,7 +209,7 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 			}).then(res => res.json())
 			  .then((out) => {
 					var obj = JSON.parse(JSON.stringify(out));
-					
+
 					//waiting animation stop
 					(document.getElementById("waitAnimation") as HTMLElement).style.display = "none";
 
@@ -215,7 +220,7 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 					//show message get from service
 					(document.getElementById("message") as HTMLElement).style.display = "block";
 					(document.getElementById('message') as HTMLElement).innerHTML = obj.message;
-					
+
 					//check post request status
 					if (obj.status==0){
 						this.messageService.info('Successful Execution');
@@ -237,7 +242,7 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 		  SmartclideServiceCreationTheiaWidget.state.stateName!='' && SmartclideServiceCreationTheiaWidget.state.stateGitlabURL!='' &&
 		  SmartclideServiceCreationTheiaWidget.state.stateGitlabToken!='' && SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility!='' &&
 		  SmartclideServiceCreationTheiaWidget.state.stateDescription!='' && SmartclideServiceCreationTheiaWidget.state.stateJenkinsURL!='' &&
-		  SmartclideServiceCreationTheiaWidget.state.stateJenkinsUser!='' && SmartclideServiceCreationTheiaWidget.state.stateJenkinsToken!='' && 
+		  SmartclideServiceCreationTheiaWidget.state.stateJenkinsUser!='' && SmartclideServiceCreationTheiaWidget.state.stateJenkinsToken!='' &&
 		  (document.getElementById("jenkins") as HTMLElement).style.display=="block")
 		{
 			//waiting animation start
@@ -261,14 +266,14 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 			}).then(res => res.json())
 			  .then((out) => {
 					var obj = JSON.parse(JSON.stringify(out));
-					
+
 					//waiting animation stop
 					(document.getElementById("waitAnimation") as HTMLElement).style.display = "none";
 
 					//show message get from service
 					(document.getElementById("message") as HTMLElement).style.display = "block";
 					(document.getElementById('message') as HTMLElement).innerHTML = obj.message;
-					
+
 					//check post request status
 					if (obj.status==0){
 						this.messageService.info('Successful Execution');
@@ -316,7 +321,7 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 		SmartclideServiceCreationTheiaWidget.state[key] = e.currentTarget.value;
     }
 
-	//update for text 
+	//update for text
 	updateInputTextArea (e: React.ChangeEvent<HTMLTextAreaElement>) {
 		SmartclideServiceCreationTheiaWidget.state.stateDescription = e.currentTarget.value;
     }
