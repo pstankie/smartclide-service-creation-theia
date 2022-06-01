@@ -15,8 +15,7 @@ import { AlertMessage } from '@theia/core/lib/browser/widgets/alert-message';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { MessageService } from '@theia/core';
 import { CommandService } from '@theia/core/lib/common/command';
-import { AuthenticationService } from '@theia/core/lib/browser/authentication-service'
-// import Keycloak from 'keycloak-js';
+import {messageTypes, buildMessage} from '@unparallel/smartclide-frontend-comm';
 
 @injectable()
 export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
@@ -42,9 +41,6 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 	@inject(CommandService)
     protected readonly commandService: CommandService;
 
-	@inject(AuthenticationService)
-	protected readonly authenticationService: AuthenticationService
-
     @postConstruct()
     protected async init(): Promise < void> {
         this.id = SmartclideServiceCreationTheiaWidget.ID;
@@ -55,12 +51,17 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 
         this.update();
 
+		//Add even listener to get the Keycloak Token
 		window.addEventListener("message", ({ data }) => {
-			if(typeof(data) === 'object' && 'type' in data && data.type === "iframe-communication"){
+			if(data.type === messageTypes.TOKEN_INFO){
 				console.log("RECEIVED", data.message);
 				SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken = data.message;
 			}
 		});
+
+		//Send a message to inform SmartCLIDE IDE
+		let message = buildMessage(messageTypes.COMPONENT_HELLO);
+		window.parent.postMessage(message, "*");
     }
 
     protected render(): React.ReactNode {
