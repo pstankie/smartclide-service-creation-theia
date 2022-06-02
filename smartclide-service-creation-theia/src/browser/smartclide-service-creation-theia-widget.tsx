@@ -16,9 +16,12 @@ import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { MessageService } from '@theia/core';
 import { CommandService } from '@theia/core/lib/common/command';
 import {messageTypes, buildMessage} from '@unparallel/smartclide-frontend-comm';
+import { Message } from '@theia/core/lib/browser';
 
 @injectable()
 export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
+
+	count=0;
 
     static readonly ID = 'smartclide-service-creation-theia:widget';
     static readonly LABEL = 'Smartclide Service Creation';
@@ -49,20 +52,32 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
         this.title.closable = true;
         this.title.iconClass = 'fa fa-cogs';
 
+		
+		console.log("-- Init run!! Before update!!");
+
         this.update();
 
 		//Add even listener to get the Keycloak Token
 		window.addEventListener("message", ({ data }) => {
 			if(data.type === messageTypes.TOKEN_INFO){
-				console.log("RECEIVED", data.message);
-				SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken = data.message;
+				console.log("RECEIVED", data.content);
+				SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken = data.content;
 			}
 		});
-
+		
 		//Send a message to inform SmartCLIDE IDE
 		let message = buildMessage(messageTypes.COMPONENT_HELLO);
 		window.parent.postMessage(message, "*");
+		
+		console.log("-- Init run!! After update!!");
     }
+
+	protected override onAfterShow(msg: Message): void {
+		if(this.count==0){
+			console.log("-- onAfterShow once!!");
+			this.count++;
+		}
+	}
 
     protected render(): React.ReactNode {
         const header = `Provide the GitLab project configuration details.`;
