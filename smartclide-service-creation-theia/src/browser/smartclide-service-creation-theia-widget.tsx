@@ -16,7 +16,6 @@ import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { MessageService } from '@theia/core';
 import { CommandService } from '@theia/core/lib/common/command';
 import { messageTypes, buildMessage } from '@unparallel/smartclide-frontend-comm';
-import { Message } from '@theia/core/lib/browser';
 
 @injectable()
 export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
@@ -36,12 +35,20 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 		stateKeycloakToken: ''
 	};
 
-	//Handle TOKEN_INFO mesage from parent
-	handleTokeInfo = (data:any) => {
-		if(data.type === messageTypes.TOKEN_INFO){
-			console.log("RECEIVED", data.content);
-			SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken = data.content;
-		}
+	//Handle TOKEN_INFO message from parent
+	handleTokenInfo = ({data}:any) => {
+    switch (data.type) {
+      case messageTypes.TOKEN_INFO:
+        console.log("RECEIVED", JSON.stringify(data, undefined, 4));
+        SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken = data.content;
+        break;
+      case messageTypes.TOKEN_REVOKE:
+        console.log("RECEIVED", JSON.stringify(data, undefined, 4));
+        window.removeEventListener("message", this.handleTokenInfo);
+        break;
+      default:
+        break;
+    }
 	}
 
     @inject(MessageService)
@@ -61,18 +68,12 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
         this.update();
 
 		//Add even listener to get the Keycloak Token
-		window.addEventListener("message", this.handleTokeInfo);
-		
+		window.addEventListener("message", this.handleTokenInfo);
+
 		//Send a message to inform SmartCLIDE IDE
 		let message = buildMessage(messageTypes.COMPONENT_HELLO);
 		window.parent.postMessage(message, "*");
     }
-
-	//After Detach Remove Listener
-	protected override onAfterDetach(msg: Message): void {
-		window.removeEventListener("message", this.handleTokeInfo);
-		super.onAfterDetach(msg);
-	}
 
     protected render(): React.ReactNode {
         const header = `Provide the GitLab project configuration details.`;
