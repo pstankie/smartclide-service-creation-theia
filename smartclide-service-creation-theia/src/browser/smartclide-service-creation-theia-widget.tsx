@@ -39,11 +39,11 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 	handleTokenInfo = ({data}:any) => {
     switch (data.type) {
       case messageTypes.TOKEN_INFO:
-        console.log("RECEIVED", JSON.stringify(data, undefined, 4));
+        console.log("service-creation: RECEIVED", JSON.stringify(data, undefined, 4));
         SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken = data.content;
         break;
       case messageTypes.TOKEN_REVOKE:
-        console.log("RECEIVED", JSON.stringify(data, undefined, 4));
+        console.log("service-creation: RECEIVED", JSON.stringify(data, undefined, 4));
         window.removeEventListener("message", this.handleTokenInfo);
         break;
       default:
