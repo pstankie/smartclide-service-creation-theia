@@ -77,7 +77,6 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 
 	//After Detach Remove Listener
 	protected onAfterDetach(msg: Message): void {
-		console.log("REMOVING EVENT LISTENER AFTER DETACH")
 		window.removeEventListener("message", this.handleTokenInfo);
 		super.onAfterDetach(msg);
 	}
