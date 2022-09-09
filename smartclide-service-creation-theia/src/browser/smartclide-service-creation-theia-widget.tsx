@@ -171,6 +171,124 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 			//waiting animation start
 			(document.getElementById("waitAnimation") as HTMLElement).style.display = "block";
 
+
+			/*
+				Start Test cors
+			*/
+			fetch('https://api.dev.smartclide.eu/smartclide-db/users',{
+				method: 'get',
+				headers : {
+					'Accept': '*/*',
+					'Authorization': 'Bearer ' + SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken
+				}
+			}).then(res => res.json())
+			  .then((out) => {
+					console.log('1: '+out);
+			}).catch(err => {
+				console.log('err 1: ', err);
+			});
+
+			fetch('https://api.dev.smartclide.eu/smartclide-db/users',{
+				method: 'get',
+				headers : {
+					'Authorization': 'Bearer ' + SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken
+				}
+			}).then(res => res.json())
+			  .then((out) => {
+					console.log('2: '+out);
+			}).catch(err => {
+				console.log('err 2: ', err);
+			});
+
+			fetch('https://api.dev.smartclide.eu/smartclide-db/users',{
+				method: 'get',
+				mode: 'no-cors',
+				headers : {
+					'Authorization': 'Bearer ' + SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken
+				}
+			}).then(res => res.json())
+			  .then((out) => {
+					console.log('3: '+out);
+			}).catch(err => {
+				console.log('err 3: ', err);
+			});
+
+			fetch('https://api.dev.smartclide.eu/smartclide-db/users',{
+				method: 'get',
+				mode: 'cors',
+				headers : {
+					'Authorization': 'Bearer ' + SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken
+				}
+			}).then(res => res.json())
+			  .then((out) => {
+					console.log('4: '+out);
+			}).catch(err => {
+				console.log('err 4: ', err);
+			});
+
+			fetch('https://api.dev.smartclide.eu/smartclide-db/users',{
+				method: 'get',
+				mode: 'no-cors',
+				headers : {
+					'Accept': '*/*',
+					'Access-Control-Allow-Origin': '*',
+					'Authorization': 'Bearer ' + SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken
+				}
+			}).then(res => res.json())
+			  .then((out) => {
+					console.log('5: '+out);
+			}).catch(err => {
+				console.log('err 5: ', err);
+			});
+
+			fetch('https://api.dev.smartclide.eu/smartclide-db/users',{
+				method: 'get',
+				mode: 'cors',
+				headers : {
+					'Accept': '*/*',
+					'Access-Control-Allow-Origin': '*',
+					'Authorization': 'Bearer ' + SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken
+				}
+			}).then(res => res.json())
+			  .then((out) => {
+					console.log('6: '+out);
+			}).catch(err => {
+				console.log('err 6: ', err);
+			});
+
+			fetch('https://api.dev.smartclide.eu/smartclide-db/users',{
+				method: 'get',
+				credentials: 'include',
+				headers : {
+					'Accept': '*/*',
+					'Access-Control-Allow-Origin': '*',
+					'Authorization': 'Bearer ' + SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken
+				}
+			}).then(res => res.json())
+			  .then((out) => {
+					console.log('7: '+out);
+			}).catch(err => {
+				console.log('err 7: ', err);
+			});
+
+			fetch('https://api.dev.smartclide.eu/smartclide-db/users',{
+				method: 'get',
+				credentials: 'include',
+				headers : {
+					'Accept': '*/*',
+					'Authorization': 'Bearer ' + SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken
+				}
+			}).then(res => res.json())
+			  .then((out) => {
+					console.log('8: '+out);
+			}).catch(err => {
+				console.log('err 8: ', err);
+			});
+			/*
+				Stop Test cors
+			*/
+
+
 			//post request
 			fetch(SmartclideServiceCreationTheiaWidget.state.stateServiceURL+'/createStructure', {
 				method: 'post',
