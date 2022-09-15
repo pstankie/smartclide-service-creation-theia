@@ -291,6 +291,23 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 			}).catch(err => {
 				console.log('err 8: ', err);
 			});
+
+			fetch(SmartclideServiceCreationTheiaWidget.state.stateServiceURL+'/createStructure', {
+				method: 'post',
+				headers: {
+					'Authorization': 'Bearer ' + SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken,
+					'projectName' : SmartclideServiceCreationTheiaWidget.state.stateName,
+					'gitLabServerURL' : SmartclideServiceCreationTheiaWidget.state.stateGitlabURL,
+					'gitlabToken' : SmartclideServiceCreationTheiaWidget.state.stateGitlabToken,
+					'projVisibility' : SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility,
+					'projDescription' : SmartclideServiceCreationTheiaWidget.state.stateDescription
+				}
+			}).then(res => res.json())
+			  .then((out) => {
+				console.log('9: '+out);
+			}).catch(err => {
+				console.log('err 9: ', err);
+			});
 			/*
 				Stop Test cors
 			*/
