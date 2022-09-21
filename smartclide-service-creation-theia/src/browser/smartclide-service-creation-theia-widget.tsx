@@ -13,7 +13,6 @@ import { injectable, postConstruct, inject } from 'inversify';
 import { AlertMessage } from '@theia/core/lib/browser/widgets/alert-message';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { MessageService } from '@theia/core';
-import { CommandService } from '@theia/core/lib/common/command';
 import { messageTypes, buildMessage } from '@unparallel/smartclide-frontend-comm';
 import { Message } from '@theia/core/lib/browser';
 
@@ -21,17 +20,12 @@ import { Message } from '@theia/core/lib/browser';
 export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 
     static readonly ID = 'smartclide-service-creation-theia:widget';
-    static readonly LABEL = 'Smartclide Service Creation';
+    static readonly LABEL = 'Smartclide Service Creation Testing';
 	static state = {
-		stateServiceURL: '',
-		stateName: '',
-		stateGitlabURL: '',
-		stateGitlabToken: '',
-		stateProjectVisibility: '',
-		stateDescription: '',
-		stateJenkinsURL: '',
-		stateJenkinsUser: '',
-		stateJenkinsToken: '',
+		stateBackEndHost: 'https://api.dev.smartclide.eu',
+		stateGitURL: '',
+		stateGitUsername: '',
+		stateGitToken: '',
 		stateKeycloakToken: ''
 	};
 
@@ -53,9 +47,6 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 
     @inject(MessageService)
     protected readonly messageService!: MessageService;
-
-	@inject(CommandService)
-    protected readonly commandService: CommandService;
 
     @postConstruct()
     protected async init(): Promise < void> {
@@ -82,7 +73,7 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 	}
 
     protected render(): React.ReactNode {
-        const header = `Provide the GitLab project configuration details.`;
+        const header = `Provide the Git project details.`;
 
 		return <div id='widget-container-ServiceCreation'>
             <AlertMessage type='INFO' header={header} />
@@ -90,69 +81,21 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 				<table>
 					<tbody>
 					  <tr>
-						<td className='cellID'>Service Creation URL</td>
+						<td className='cellID'>Git URL:</td>
 						<td>
-							<input onChange={this.updateInput} placeholder='Service' name='stateServiceURL'/>
+							<input onChange={this.updateInput} placeholder='URL' name='stateGitURL'/>
 						</td>
 					  </tr>
 					  <tr>
-						<td className='cellID'>GitLab Server URL</td>
+						<td className='cellID'>Git Username:</td>
 						<td>
-							<input onChange={this.updateInput} placeholder='URL' name='stateGitlabURL'/>
+							<input onChange={this.updateInput} placeholder='Username' name='stateGitUsername'/>
 						</td>
 					  </tr>
 					  <tr>
-						<td className='cellID'>GitLab Token</td>
+						<td className='cellID'>Git Token:</td>
 						<td>
-							<input type='password' onChange={this.updateInput} placeholder='Token' name='stateGitlabToken'/>
-						</td>
-					  </tr>
-					  <tr>
-						<td className='cellID'>Project Name</td>
-						<td>
-							<input onChange={this.updateInput} maxLength={100} placeholder='Name' name='stateName'/>
-						</td>
-					  </tr>
-					  <tr>
-						<td className='cellID'>Project Visibility</td>
-						<td id='radio_buttons'>
-							<input className='inputRadio' type="radio" id="visibility1" name="visibility" value="0" onChange={this.onValueChange}/>
-							<label htmlFor="visibility1">public</label>
-							<input className='inputRadio' type="radio" id="visibility2" name="visibility" value="1" onChange={this.onValueChange}/>
-							<label htmlFor="visibility2">internal</label>
-							<input className='inputRadio' type="radio" id="visibility3" name="visibility" value="2" onChange={this.onValueChange}/>
-							<label htmlFor="visibility3">private</label>
-						</td>
-					  </tr>
-					  <tr>
-						<td className='cellID'>Description</td>
-						<td>
-							<textarea id="textDescription" onChange={this.updateInputTextArea} rows={2}></textarea>
-						</td>
-					  </tr>
-					</tbody>
-				</table>
-				<label>
-					<input type="checkbox" onChange={this.onCheckBoxChange}/>Use Jenkins
-				</label>
-				<table id='jenkins' style={{display: 'none'}}>
-					<tbody>
-				      <tr>
-						<td className='cellID'>Jenkins Server Url</td>
-						<td>
-							<input onChange={this.updateInput} placeholder='URL' name='stateJenkinsURL'/>
-						</td>
-					  </tr>
-					  <tr>
-						<td className='cellID'>Jenkins Username</td>
-						<td>
-							<input onChange={this.updateInput} maxLength={100} placeholder='Username' name='stateJenkinsUser'/>
-						</td>
-					  </tr>
-					  <tr>
-						<td className='cellID'>Jenkins Token</td>
-						<td>
-							<input type='password' onChange={this.updateInput} placeholder='Token' name='stateJenkinsToken'/>
+							<input type='password' onChange={this.updateInput} placeholder='Token' name='stateGitToken'/>
 						</td>
 					  </tr>
 					</tbody>
@@ -165,31 +108,23 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
     }
 
     protected async runprocess() {
-		console.log('...');
-		console.log(SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken);
-		console.log('...');
-
 		//if all the fields have values
-		if(SmartclideServiceCreationTheiaWidget.state.stateServiceURL!='' &&
-		   SmartclideServiceCreationTheiaWidget.state.stateName!='' && SmartclideServiceCreationTheiaWidget.state.stateGitlabURL!='' &&
-		   SmartclideServiceCreationTheiaWidget.state.stateGitlabToken!='' && SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility!='' &&
-		   SmartclideServiceCreationTheiaWidget.state.stateDescription!='' && (document.getElementById("jenkins") as HTMLElement).style.display=="none")
+		if(SmartclideServiceCreationTheiaWidget.state.stateGitURL!='' &&
+		   SmartclideServiceCreationTheiaWidget.state.stateGitUsername!='' && SmartclideServiceCreationTheiaWidget.state.stateGitToken!='')
 		{
 			//waiting animation start
 			(document.getElementById("waitAnimation") as HTMLElement).style.display = "block";
 
 			//post request
-			fetch(SmartclideServiceCreationTheiaWidget.state.stateServiceURL+'/createStructure', {
+			fetch(SmartclideServiceCreationTheiaWidget.state.stateBackEndHost+'/generateTests', {
 				method: 'post',
 				headers: {
 					'Accept': '*/*',
 					'Access-Control-Allow-Origin': '*',
 					'Authorization': 'Bearer ' + SmartclideServiceCreationTheiaWidget.state.stateKeycloakToken,
-					'projectName' : SmartclideServiceCreationTheiaWidget.state.stateName,
-					'gitLabServerURL' : SmartclideServiceCreationTheiaWidget.state.stateGitlabURL,
-					'gitlabToken' : SmartclideServiceCreationTheiaWidget.state.stateGitlabToken,
-					'projVisibility' : SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility,
-					'projDescription' : SmartclideServiceCreationTheiaWidget.state.stateDescription
+					'gitRepoURL' : SmartclideServiceCreationTheiaWidget.state.stateGitURL,
+					'gitUsername' : SmartclideServiceCreationTheiaWidget.state.stateGitUsername,
+					'gitToken' : SmartclideServiceCreationTheiaWidget.state.stateGitToken
 				}
 			}).then(res => res.json())
 			  .then((out) => {
@@ -205,61 +140,6 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 					//check post request status
 					if (obj.status==0){
 						this.messageService.info('Successful Execution');
-						//Create dir and clone
-						this.createAndClone(obj.message);
-					}
-					else{
-						this.messageService.info('Error In Execution');
-					}
-			  })
-			  .catch(err => {
-				(document.getElementById("waitAnimation") as HTMLElement).style.display = "none";
-				console.log('err: ', err);
-				(document.getElementById("message") as HTMLElement).style.display = "block";
-				(document.getElementById('message') as HTMLElement).innerHTML = 'Error With Service';
-			  });
-		}
-		else if(SmartclideServiceCreationTheiaWidget.state.stateServiceURL!='' &&
-		  SmartclideServiceCreationTheiaWidget.state.stateName!='' && SmartclideServiceCreationTheiaWidget.state.stateGitlabURL!='' &&
-		  SmartclideServiceCreationTheiaWidget.state.stateGitlabToken!='' && SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility!='' &&
-		  SmartclideServiceCreationTheiaWidget.state.stateDescription!='' && SmartclideServiceCreationTheiaWidget.state.stateJenkinsURL!='' &&
-		  SmartclideServiceCreationTheiaWidget.state.stateJenkinsUser!='' && SmartclideServiceCreationTheiaWidget.state.stateJenkinsToken!='' &&
-		  (document.getElementById("jenkins") as HTMLElement).style.display=="block")
-		{
-			//waiting animation start
-			(document.getElementById("waitAnimation") as HTMLElement).style.display = "block";
-
-			//post request
-			fetch(SmartclideServiceCreationTheiaWidget.state.stateServiceURL+'/createStructure', {
-				method: 'post',
-				headers: {
-					'Accept': '*/*',
-					'Access-Control-Allow-Origin': '*',
-					'projectName' : SmartclideServiceCreationTheiaWidget.state.stateName,
-					'gitLabServerURL' : SmartclideServiceCreationTheiaWidget.state.stateGitlabURL,
-					'gitlabToken' : SmartclideServiceCreationTheiaWidget.state.stateGitlabToken,
-					'projVisibility' : SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility,
-					'projDescription' : SmartclideServiceCreationTheiaWidget.state.stateDescription,
-					'jenkinsServerUrl' : SmartclideServiceCreationTheiaWidget.state.stateJenkinsURL,
-					'jenkinsUsername' : SmartclideServiceCreationTheiaWidget.state.stateJenkinsUser,
-					'jenkinsToken' : SmartclideServiceCreationTheiaWidget.state.stateJenkinsToken
-				}
-			}).then(res => res.json())
-			  .then((out) => {
-					var obj = JSON.parse(JSON.stringify(out));
-
-					//waiting animation stop
-					(document.getElementById("waitAnimation") as HTMLElement).style.display = "none";
-
-					//show message get from service
-					(document.getElementById("message") as HTMLElement).style.display = "block";
-					(document.getElementById('message') as HTMLElement).innerHTML = obj.message;
-
-					//check post request status
-					if (obj.status==0){
-						this.messageService.info('Successful Execution');
-						//Create dir and clone
-						this.createAndClone(obj.message);
 					}
 					else{
 						this.messageService.info('Error In Execution');
@@ -278,47 +158,9 @@ export class SmartclideServiceCreationTheiaWidget extends ReactWidget {
 		}
     }
 
-	//create dir and clone
-	createAndClone(message: String){
-		//Create dir and clone
-		(async () => {
-			try {
-				//Clone
-				let gitClone= 'https://oauth2:' + SmartclideServiceCreationTheiaWidget.state.stateGitlabToken
-									+ '@' + message.replace('https://','');
-				this.commandService.executeCommand('git.clone', gitClone);
-
-				//go to Open Folder
-				this.commandService.executeCommand('workspace:open');
-			} catch(e) {
-				this.messageService.info('Error in git clone');
-			}
-		})();
-	}
-
 	//update the state
 	updateInput (e: React.ChangeEvent<HTMLInputElement>) {
 		const key =e.currentTarget.name as keyof typeof SmartclideServiceCreationTheiaWidget.state
 		SmartclideServiceCreationTheiaWidget.state[key] = e.currentTarget.value;
     }
-
-	//update for text
-	updateInputTextArea (e: React.ChangeEvent<HTMLTextAreaElement>) {
-		SmartclideServiceCreationTheiaWidget.state.stateDescription = e.currentTarget.value;
-    }
-
-	//update for radio group
-	onValueChange(event: React.ChangeEvent<HTMLInputElement>) {
-		SmartclideServiceCreationTheiaWidget.state.stateProjectVisibility= event.target.value;
-	}
-
-	//update Jenkins visibility
-	onCheckBoxChange(e: React.ChangeEvent<HTMLInputElement>) {
-		if(e.target.checked){
-			(document.getElementById("jenkins") as HTMLElement).style.display = "block";
-		}
-		else{
-			(document.getElementById("jenkins") as HTMLElement).style.display = "none";
-		}
-	 }
 }

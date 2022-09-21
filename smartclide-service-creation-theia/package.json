@@ -10,7 +10,6 @@
   ],
   "dependencies": {
     "@theia/core": "latest",
-    "@theia/terminal": "latest",
     "@unparallel/smartclide-frontend-comm": "0.4.0"
   },
   "devDependencies": {

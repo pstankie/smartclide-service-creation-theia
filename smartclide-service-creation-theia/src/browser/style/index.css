@@ -39,35 +39,10 @@
 	margin-top: 20px;
 }
 
-
-#widget-container-ServiceCreation label{
-	margin-right: 10px;
-	font-style: italic;
-}
-
-#widget-container-ServiceCreation input[type='radio']{
-    width: fit-content;
-}
-
-#widget-container-ServiceCreation textarea{
-    margin-top: 4px;
-	width: 85%;
-	resize: vertical;
-}
-
 #message{
 	display: none;
 	margin-left: 10px;
 	margin-top: 2px;
-}
-
-#widget-container-ServiceCreation input[type='checkbox']{
-	width: auto !important;
-    margin-left: 20px;
-}
-
-#jenkins{
-	margin-top: 5px !important;
 }
 
 /* waiting animation */
