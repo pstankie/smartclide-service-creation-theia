@@ -1,5 +1,5 @@
 site_name: SmartCLIDE Service Creation Testing Frontend Component
-repo_url: https://github.com/eclipse-researchlabs/smartclide-service-creation-theia
+repo_url: https://github.com/eclipse-opensmartclide/smartclide-service-creation-theia
 
 nav:
   - Service Creation Testing Frontend: 'index.md'
