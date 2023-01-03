@@ -49,3 +49,4 @@ Open http://localhost:3000 in the browser.
     yarn start
 
 *or:* launch `Start Electron Backend` configuration from VS code.
+
